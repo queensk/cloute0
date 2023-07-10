@@ -1,0 +1,36 @@
+.user-suggestions {
+  margin: 5% 2%;
+  width: 20%;
+}
+
+.user-suggestions-header {
+  display: flex;
+}
+
+.user-suggestions-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.user-suggestions-card-info {
+  margin: 0 10px;
+}
+
+.user-suggestions-container img {
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+}
+
+.user-suggestions-card {
+  display: flex;
+  padding: 5%;
+}
+
+.follow-btn {
+  padding: 10px;
+  background-color: #000;
+  border-radius: 20px;
+  color: #fff;
+}
