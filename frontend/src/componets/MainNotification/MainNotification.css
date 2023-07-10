@@ -1,0 +1,46 @@
+.main-notification-container {
+  width: 60%;
+  height: 100vh;
+  border-right: 2px solid rgb(184, 183, 183);
+  border-left: 2px solid rgb(184, 183, 183);
+  padding: 3%;
+  overflow-y: scroll;
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  section::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.main-notification-header {
+  margin: 1%;
+  height: 10%;
+  border-radius: 10px;
+  background-color: gainsboro;
+  display: flex;
+  align-items: center;
+}
+
+.main-notification-header h3 {
+  margin: 5%;
+}
+
+.main-notification-body {
+  display: flex;
+  align-items: center;
+}
+
+.main-notification-logo img {
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+}
+
+.main-notification-content {
+  margin: 2%;
+}
+
+.main-notification-content p {
+  margin: 1% 0;
+}
