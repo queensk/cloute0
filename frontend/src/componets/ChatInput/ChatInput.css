@@ -1,0 +1,47 @@
+/* style the chat input */
+.chat-input {
+  /* use a flex display and align items to the center */
+  display: flex;
+  align-items: center;
+
+  /* use a white background and a gray border */
+  background-color: #fff;
+  border: 1px solid #ddd;
+
+  /* use some padding around the input and button */
+  padding: 10px;
+}
+
+/* style the input element */
+.chat-input input {
+  /* use a flex grow to fill the available space */
+  flex-grow: 1;
+
+  /* use a roboto font for the text */
+  font-family: "Roboto", sans-serif;
+
+  /* use a medium font size and a gray color */
+  font-size: 16px;
+  color: #333;
+
+  /* remove the default border and outline */
+  border: none;
+  outline: none;
+}
+
+/* style the button element */
+.chat-input button {
+  /* use a transparent background and border */
+  background-color: transparent;
+  border: none;
+
+  /* use a cursor pointer to indicate interactivity */
+  cursor: pointer;
+}
+
+/* style the icon element */
+.chat-input button svg {
+  color: #0f9d58;
+  width: 32px;
+  height: 32px;
+}
