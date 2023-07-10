@@ -1,0 +1,16 @@
+.friend-data {
+  display: flex;
+  margin: 4% 0;
+  padding: 2%;
+  background-color: aliceblue;
+  border-radius: 10px;
+}
+.friend-data img {
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+}
+
+.friend-data-info {
+  margin: 0 3%;
+}
