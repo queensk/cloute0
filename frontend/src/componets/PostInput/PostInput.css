@@ -1,0 +1,64 @@
+.post-input-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  /* max-width: 600px; */
+  margin: 0 auto;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #1da1f2;
+  background-color: #fff;
+}
+
+.post-input {
+  width: 100%;
+  min-height: 60px;
+  padding: 8px;
+  border: none;
+  resize: none;
+  font-size: 16px;
+  outline: none;
+}
+
+.post-input-icons {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+  font-size: 20px;
+  color: #999;
+}
+
+.post-input-icons .post-input-icon {
+  margin-right: 12px;
+  cursor: pointer;
+}
+
+.post-input-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.post-input-actions .post-input-action {
+  margin-right: 8px;
+  font-size: 20px;
+  color: #999;
+  cursor: pointer;
+}
+
+.post-input-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 9999px;
+  background-color: #1da1f2;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.post-input-button:focus,
+.post-input-button:hover {
+  background-color: #0c87e8;
+}
