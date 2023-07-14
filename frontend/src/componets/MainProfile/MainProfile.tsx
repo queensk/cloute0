@@ -1,20 +1,30 @@
-import React from "react";
 import "./MainProfile.css";
 import { useState } from "react";
-
-type UserProfileProps = {
-  name: string; // the name of the user
-  username: string; // the username of the user
-  bio: string; // the bio of the user
-  location: string; // the location of the user
-  website: string; // the website of the user
-  joined: string; // the date when the user joined
-  following: number; // the number of users that the user is following
-  followers: number; // the number of users that are following the user
-  tweets: number; // the number of tweets that the user has posted
-};
+import { useSelector } from "react-redux";
+import { RootState } from "../../Redux/store";
+import { usePatchUserMutation } from "../../features/auth/authApi";
+import { useDispatch } from "react-redux";
+import { setUser } from "../../features/auth/authSlice";
+import { UserData } from "../../types/user";
+import {
+  MdLocationOn,
+  MdAddPhotoAlternate,
+  MdLink,
+  MdCalendarMonth,
+} from "react-icons/md";
+import { Link } from "react-router-dom";
 
 export default function MainProfile() {
+  const userData = useSelector((state: RootState) => state.auth.user);
+  const [editMode, setEditMode] = useState(false);
+  const [name, setName] = useState(userData.name || "");
+  const [username, setUsername] = useState(userData.userName || "");
+  const [bio, setBio] = useState(userData.bio || "");
+  const [location, setLocation] = useState(userData.location || "");
+  const [website, setWebsite] = useState(userData.website || "");
+  const [patchUser] = usePatchUserMutation();
+  const dispatch = useDispatch();
+
   const dummyData = {
     name: "John Doe", // a dummy name
     username: "johndoe", // a dummy username
@@ -26,11 +36,31 @@ export default function MainProfile() {
     followers: 456, // a dummy followers count
     tweets: 789, // a dummy tweets count
   };
-  const [editMode, setEditMode] = useState(false);
   const handleEdit = () => {
     setEditMode(!editMode);
   };
-
+  const handleSave = async () => {
+    const data = {
+      name: name,
+      userName: username,
+      bio: bio,
+      location: location,
+      website: website,
+    };
+    const response = await patchUser({
+      id: userData.id,
+      user: data,
+    });
+    if ("data" in response && "data" in response.data) {
+      const updatedUserData: UserData = response.data.data;
+      dispatch(setUser(updatedUserData));
+      setEditMode(false);
+    } else if ("error" in response && response.error) {
+      console.error(response.error);
+    } else {
+      console.error("Invalid response format");
+    }
+  };
   return (
     <div className="main-container">
       <div className="user-profile">
@@ -39,81 +69,102 @@ export default function MainProfile() {
           alt="User Banner"
           className="user-banner"
         />
-
+        {editMode && (
+          <button className="upload-user-banner-button">
+            <MdAddPhotoAlternate />
+          </button>
+        )}
         <div className="user-info">
           <img
             src="https://picsum.photos/id/237/200/300"
             alt="User Avatar"
             className="user-avatar"
           />
-          <button className="edit-button" onClick={handleEdit}>
+          {editMode && (
+            <button className="upload-user-avatar-button">
+              <MdAddPhotoAlternate />
+            </button>
+          )}
+          <button
+            className="edit-button"
+            onClick={editMode ? handleSave : handleEdit}
+          >
             {editMode ? "Save" : "Edit Profile"}
           </button>
           <div className="user-details-container">
             {editMode ? (
-              <>
+              <div className="user-details-inputs">
+                <label htmlFor="name">Name</label>
                 <input
                   type="text"
-                  value={dummyData.name}
-                  onChange={(e) => {
-                    dummyData.name = e.target.value;
-                  }}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   className="user-name-input"
+                  placeholder="John Doe"
                 />
+                <label htmlFor="username">User Name</label>
                 <input
                   type="text"
-                  value={dummyData.username}
-                  onChange={(e) => {
-                    // update the username with the input value
-                    dummyData.username = e.target.value;
-                  }}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   className="user-username-input"
+                  placeholder="johndoe"
                 />
-                <input
-                  type="text"
-                  value={dummyData.bio}
-                  onChange={(e) => {
-                    // update the bio with the input value
-                    dummyData.bio = e.target.value;
-                  }}
+                <label htmlFor="bio">Bio</label>
+                <textarea
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
                   className="user-bio-input"
+                  placeholder="I'm a web developer and a twitter enthusiast."
                 />
-              </>
+              </div>
             ) : (
-              <>
-                <h1 className="user-name">{dummyData.name}</h1>
-                <p className="user-username">@{dummyData.username}</p>
-                <p className="user-bio">{dummyData.bio}</p>
-              </>
+              <div className="user-details-inputs">
+                <h1 className="user-name">{userData.name || `Your Name`}</h1>
+                <p className="user-username">@{userData.userName || `user`}</p>
+                <p className="user-bio">{userData.bio || `create a bio`}</p>
+              </div>
             )}
 
             <div className="user-details">
               {editMode ? (
-                <>
+                <div className="user-details-input-location-website">
+                  <label htmlFor="location">Location</label>
                   <input
                     type="text"
-                    value={dummyData.location}
-                    onChange={(e) => {
-                      // update the location with the input value
-                      dummyData.location = e.target.value;
-                    }}
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
                     className="user-location-input"
+                    placeholder="New York, USA"
                   />
+                  <label htmlFor="website">Website</label>{" "}
                   <input
                     type="text"
-                    value={dummyData.website}
-                    onChange={(e) => {
-                      // update the website with the input value
-                      dummyData.website = e.target.value;
-                    }}
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
                     className="user-website-input"
+                    placeholder="https://johndoe.com"
                   />
-                </>
+                </div>
               ) : (
                 <>
-                  <span className="user-location">{dummyData.location}</span>
-                  <span className="user-website">{dummyData.website}</span>
-                  <span className="user-joined">Joined {dummyData.joined}</span>
+                  <span className="user-location">
+                    <MdLocationOn />
+                    {userData.location || "add locations"}
+                  </span>
+                  <Link to={userData.website ? userData.website : "/"}>
+                    <span className="user-website">
+                      <MdLink />
+                      {userData.website || "add website"}
+                    </span>
+                  </Link>
+                  <span className="user-joined">
+                    <MdCalendarMonth /> Joined{" "}
+                    {new Date(userData.createAt).toLocaleString("en-US", {
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </span>
                 </>
               )}
             </div>
@@ -121,7 +172,7 @@ export default function MainProfile() {
               {!editMode && (
                 <>
                   <span className="user-tweets">
-                    {dummyData.tweets} <strong>Tweets</strong>
+                    {dummyData.tweets} <strong>Clout</strong>
                   </span>
                   <span className="user-following">
                     {dummyData.following} <strong>Following</strong>
