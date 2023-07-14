@@ -5,6 +5,11 @@ import * as yup from "yup";
 import "./SignIn.css";
 import { Link } from "react-router-dom";
 import Log from "./Frame 7.png";
+import { useLoginMutation } from "../../features/auth/authApi";
+import { useDispatch } from "react-redux";
+import { setToken, setUser } from "../../features/auth/authSlice";
+import { useNavigate } from "react-router-dom";
+import jwtDecode from "jwt-decode";
 
 const schema = yup.object().shape({
   email: yup
@@ -20,6 +25,9 @@ type FormData = {
 };
 
 const SignIn: React.FC = () => {
+  const dispatch = useDispatch();
+  const [loginMutation] = useLoginMutation();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -29,7 +37,16 @@ const SignIn: React.FC = () => {
   });
 
   const onSubmit = async (data: FormData) => {
-    console.log(data);
+    try {
+      const response = await loginMutation(data).unwrap();
+      const token = response?.data?.token.split(" ")[1];
+      const decodedToken = jwtDecode(token);
+      dispatch(setToken(token));
+      dispatch(setUser(decodedToken));
+      navigate("/", { replace: true });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -61,6 +78,8 @@ const SignIn: React.FC = () => {
             Sign In
           </button>
           <div className="signIn-terms-container">
+            {/* {isError && <p>Invalid credentials</p>} */}
+            {/* {isLoading && <p>Invalid credentials</p>} */}
             <p>
               Forgot password? Sign up for <Link to="/">cloute0</Link>
             </p>
