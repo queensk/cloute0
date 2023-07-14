@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import "./SideNav.css";
 import Logo from "./Frame 7.png";
 import { useSelector, useDispatch } from "react-redux";
@@ -9,13 +9,21 @@ import {
   MdChat,
   MdPerson,
   MdPeople,
+  MdAddCircleOutline,
+  MdLogout,
 } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { RootState } from "../../Redux/store";
+import { Context } from "../../Context/inputContext";
+import { clearAuth } from "../../features/auth/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const SideNav: React.FC = () => {
-  const ui = useSelector((state: RootState) => state.ui.ui);
+  const ui = useSelector((state: RootState) => state?.ui?.ui);
   const dispatch = useDispatch();
+  const { setShowPostInput } = useContext(Context);
+  const navigate = useNavigate();
+
   const handleUIChange = (e: React.MouseEvent<HTMLButtonElement>) => {
     const value = e.currentTarget.value as UIState["ui"];
     switch (value) {
@@ -39,6 +47,14 @@ const SideNav: React.FC = () => {
     }
   };
 
+  const handleNewPostClick = () => {
+    setShowPostInput(true);
+  };
+  const handleLogout = () => {
+    dispatch(clearAuth());
+    navigate("/login", { replace: true });
+  };
+
   return (
     <div className="side-nav">
       <div className="side-nav-logo">
@@ -50,7 +66,11 @@ const SideNav: React.FC = () => {
             <li key={option}>
               <button value={option} onClick={handleUIChange}>
                 <Link to={option === "Home" ? "/" : `/${option.toLowerCase()}`}>
-                  <span className={ui === option ? "active" : ""}>
+                  <span
+                    className={
+                      ui === option ? "active side-nav-icon" : "side-nav-icon"
+                    }
+                  >
                     {option === "Home" && <AiOutlineHome />}
                     {option === "Notification" && (
                       <MdOutlineNotificationsActive />
@@ -59,13 +79,34 @@ const SideNav: React.FC = () => {
                     {option === "Friends" && <MdPeople />}
                     {option === "Profile" && <MdPerson />}
                   </span>
-                  <span>{option}</span>
+                  <span
+                    className={
+                      ui === option ? "side-nav-text active" : "side-nav-text"
+                    }
+                  >
+                    {option}
+                  </span>
                 </Link>
               </button>
             </li>
           )
         )}
-        <li>New Post </li>
+        <li className="new-post-btn">
+          <button onClick={handleNewPostClick}>
+            <span className="new-post-text">New Post</span>
+            <span>
+              <MdAddCircleOutline />
+            </span>
+          </button>
+        </li>
+        <li className="logout-btn">
+          <button onClick={handleLogout}>
+            <span className="new-post-text">Log Out</span>
+            <span>
+              <MdLogout />
+            </span>
+          </button>
+        </li>
       </ul>
     </div>
   );
