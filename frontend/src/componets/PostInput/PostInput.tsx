@@ -5,17 +5,21 @@ import { FaRegSmile } from "react-icons/fa";
 import { GrFormClose } from "react-icons/gr";
 import { IconContext } from "react-icons";
 import "./PostInput.css";
+import { useCreatePostMutation } from "../../features/auth/authApi";
+import { useSelector } from "react-redux";
+import { RootState } from "../../Redux/store";
 
-// Import the emoji picker component from emoji-picker-react
-import EmojiPicker from "emoji-picker-react";
+// Import the emoji function from react-easy-emoji
+import emoji from "react-easy-emoji";
 
 const PostInput: React.FC = () => {
   const [content, setContent] = useState("");
+  const [selectedEmoji, setSelectedEmoji] = useState("");
+  const [file, setFile] = useState<File | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Create a state variable to store the emoji picker visibility
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [createPost] = useCreatePostMutation();
+  const userId = useSelector((state: RootState) => state.auth.user?.id);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContent(event.target.value);
@@ -23,11 +27,19 @@ const PostInput: React.FC = () => {
 
   const handleClearInput = () => {
     setContent("");
+    setSelectedEmoji("");
+    setFile(null);
   };
 
-  const handlePost = () => {
-    // Logic to handle post
-    console.log("Post content:", content);
+  const handlePost = async () => {
+    const data = await createPost({
+      userId: userId,
+      post: content + selectedEmoji,
+      postImage: "",
+      postVideo: "",
+    });
+    console.log(data);
+    handleClearInput();
   };
 
   const handleImageUpload = () => {
@@ -49,28 +61,23 @@ const PostInput: React.FC = () => {
     if (file) {
       // Logic to handle the selected image file
       console.log("Selected image:", file);
+      setFile(file);
     }
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Logic to handle the selected file
       console.log("Selected file:", file);
+      setFile(file);
     }
   };
 
-  // Create a handler function to toggle the emoji picker visibility
-  const handleEmojiToggle = () => {
-    setShowEmojiPicker(!showEmojiPicker);
-  };
-
-  // Create a handler function to append the selected emoji to the content state
-  // Use the emojiObject parameter instead of the emoji parameter
-  const handleEmojiSelect = (event: any, emoji) => {
-    console.log(emoji.unified);
-    setContent((content) => content + emoji.unified);
-    setShowEmojiPicker(false);
+  // Create a handler function to append the selected emoji to the content state and the selected emoji state
+  const handleEmojiSelect = (event: React.MouseEvent) => {
+    const emoji = (event.target as HTMLImageElement).alt;
+    setContent((content) => content + emoji);
+    setSelectedEmoji(emoji);
   };
 
   return (
@@ -80,20 +87,28 @@ const PostInput: React.FC = () => {
         placeholder="What's happening?"
         value={content}
         onChange={handleInputChange}
-      ></textarea>
-      {/* Render the emoji picker component using EmojiPicker instead of Picker */}
-      {/* Pass the handleEmojiSelect function as the onEmojiClick prop */}
-      {showEmojiPicker && (
-        <div className="emoji-picker">
-          <EmojiPicker onEmojiClick={handleEmojiSelect} native={true} />
-        </div>
-      )}
+      >
+        {file && (
+          <div className="post-input-file">
+            {file.type.startsWith("image") ? (
+              <img src={URL.createObjectURL(file)} alt="uploaded image" />
+            ) : (
+              <video src={URL.createObjectURL(file)} controls />
+            )}
+          </div>
+        )}
+      </textarea>
+      <div className="emoji-picker" onClick={handleEmojiSelect}>
+        {emoji(
+          "😀 😁 😂 🤣 😃 😄 😅 😆 😉 😊 😋 😎 😍 😘 🥰 😗 😙 😚 ☺️ 🙂 🤗 🤩 🤔 🤨 😐 😑 😶 🙄 😏 😣"
+        )}
+      </div>
       <div className="post-input-icons">
         <IconContext.Provider value={{ className: "post-input-icon" }}>
           <RiImageAddLine onClick={handleImageUpload} />
           <RiVideoAddLine onClick={handleFileUpload} />
-          {/* Add an onClick handler to the smile icon to trigger the handleEmojiToggle function */}
-          <FaRegSmile onClick={handleEmojiToggle} />
+          {/* Remove the onClick handler from the smile icon */}
+          <FaRegSmile />
         </IconContext.Provider>
         <input
           type="file"
@@ -106,12 +121,12 @@ const PostInput: React.FC = () => {
           type="file"
           ref={fileInputRef}
           style={{ display: "none" }}
-          accept="image/*"
+          accept="video/*"
           onChange={handleFileChange}
         />
       </div>
       <div className="post-input-actions">
-        {content.length > 0 && (
+        {(content.length > 0 || selectedEmoji.length > 0 || file) && (
           <div className="post-input-action" onClick={handleClearInput}>
             <GrFormClose />
           </div>
