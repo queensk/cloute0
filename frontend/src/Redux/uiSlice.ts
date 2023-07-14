@@ -19,6 +19,6 @@ export const uiSlice = createSlice({
 });
 
 export const { changeUI } = uiSlice.actions;
-export const selectUI = (state: UIState) => state.ui;
+export const selectUI = (state: { ui: UIState }) => state.ui.ui;
 
 export default uiSlice.reducer;
