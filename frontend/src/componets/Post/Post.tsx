@@ -1,9 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Post.css";
 import Logo from "./_2332e6e9-f74e-4fb8-8bff-d6bd53e9602f.jpg";
-import { MdOutlineFavorite } from "react-icons/md";
+import { MdFavorite, MdThumbUpOffAlt, MdComment, MdSend } from "react-icons/md";
 
 export default function Post() {
+  const [showComments, setShowComments] = useState(false);
+
+  const toggleComments = () => {
+    setShowComments(!showComments);
+  };
+
   return (
     <div className="main-post-container">
       <div className="post-header">
@@ -12,8 +18,8 @@ export default function Post() {
             <img src={Logo} alt="" />
           </div>
           <div className="post-header-left-name-user">
-            <p>name</p>
-            <p>@user</p>
+            <p>queens</p>
+            <p>@queensk</p>
           </div>
         </div>
         <div className="post-header-right">
@@ -33,9 +39,39 @@ export default function Post() {
         </p>
         <img src={Logo} alt="" />
         <div className="post-footer">
-          <span>love</span>
-          <span>comment</span>
+          <span className="">
+            <MdFavorite />
+          </span>
+          <span>
+            <MdThumbUpOffAlt />
+          </span>
+          <span onClick={toggleComments}>
+            <MdComment />
+          </span>
         </div>
+        {showComments && (
+          <div className="post-comments">
+            <div className="comment">
+              <div className="comment-user">
+                <img src={Logo} alt="" />
+                <p>@john</p>
+              </div>
+              <p className="comment-text">Great post! 🎉</p>
+            </div>
+            <div className="comment">
+              <div className="comment-user">
+                <img src={Logo} alt="" />
+                <p>@mary</p>
+              </div>
+              <p className="comment-text">Happy Independence Day! 🇺🇸</p>
+            </div>
+            {/* Add more comments as needed */}
+            <div className="comment-input">
+              <input type="text" placeholder="Write a comment..." />
+              <MdSend />
+            </div>
+          </div>
+        )}
       </div>
       <div className="post-border-bottom"></div>
     </div>
