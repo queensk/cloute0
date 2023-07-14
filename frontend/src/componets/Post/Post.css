@@ -53,4 +53,73 @@
 
 .post-footer {
   margin: 3% 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.post-footer svg {
+  height: 25px;
+  width: 25px;
+}
+
+.post-comments {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #f5f8fa;
+  border-radius: 8px;
+}
+
+.comment {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.comment-user img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.comment-user p {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.comment-text {
+  font-size: 14px;
+}
+
+.comment-input {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  border: none;
+  outline: 2px solid #1da1f2;
+  border-radius: 20px;
+}
+
+.comment-input input {
+  flex-grow: 1;
+  padding: 8px;
+  border-radius: 20px;
+  border: none;
+  background-color: #e8f0fe;
+  margin-right: 8px;
+  font-size: 14px;
+  border: none;
+  outline: none;
+}
+
+.comment-input input::placeholder {
+  color: #999;
+}
+
+.comment-input svg {
+  color: #1da1f2;
+  cursor: pointer;
+  font-size: 18px;
 }
