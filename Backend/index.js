@@ -5,13 +5,16 @@
 
 import express from "express";
 import cors from "cors";
-import route from "./routes/routes.js";
+import routes from "./routes/routes.js";
+import { config } from "./utils/db.js";
+import userAuthorized from "./utils/authMiddleware.js";
 
 const app = express();
 
+app.use(userAuthorized);
 app.use(cors());
 app.use(express.json());
-app.use(route);
+app.use(routes);
 
 /**
  * A default handler that sends a greeting message.
@@ -25,6 +28,6 @@ app.get("/", (req, res) => {
 /**
  * Starts the server on port 8085 and logs a message.
  */
-app.listen(8085, () => {
-  console.log("Server is running on port 3000 http://localhost:8085");
+app.listen(config.port | 8085, () => {
+  console.log(`Server is running on ${config.url}`);
 });
