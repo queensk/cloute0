@@ -47,6 +47,15 @@
   cursor: pointer;
 }
 
+.post-input-icons .post-input-icon:hover {
+  color: #1da1f2;
+}
+
+.post-input-icons .post-input-icon svg {
+  width: 30px;
+  height: 30px;
+}
+
 .post-input-button {
   padding: 8px 16px;
   border: none;
@@ -61,4 +70,9 @@
 .post-input-button:focus,
 .post-input-button:hover {
   background-color: #0c87e8;
+}
+
+.post-input-icon svg {
+  width: 25px;
+  height: 25px;
 }
