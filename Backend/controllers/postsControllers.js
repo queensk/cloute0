@@ -90,12 +90,21 @@ export const getPostById = async (req, res) => {
     mssql.close();
   }
 };
+
+/**
+*
+A controller for getting a new post
+*@param {Object} req - The request object
+*@param {Object} res - The response object
+*/
+
 /**
 *
 A controller for creating a new post
 *@param {Object} req - The request object
 *@param {Object} res - The response object
 */
+
 export const createPost = async (req, res) => {
   try {
     const { userId, post, postImage, postVideo } = req.body;
@@ -113,7 +122,7 @@ export const createPost = async (req, res) => {
       .input("createdAt", mssql.DateTime, createdAt)
       .input("updatedAt", mssql.DateTime, updatedAt)
       .query(
-        "INSERT INTO socialClout.posts (id, userId, post, postImage, postVideo, createdAt, updatedAt) VALUES (@id, @userId, @post, @postImage, @postVideo, @createdAt, @updatedAt)"
+        "INSERT INTO socialClout.posts (id, userId, post, postImage, postVideo, createdAt, updatedAt) VALUES (@id, @userId, @post, @postImage, @postVideo, @createdAt, @)"
       );
     if (request.rowsAffected[0] === 1) {
       const postRequest = await pool
@@ -183,6 +192,9 @@ export const updatePost = async (req, res) => {
 export const deletePost = async (req, res) => {
   try {
     const { id } = req.params;
+    if (id === undefined) {
+      res.status(400).json(apiJSON({}, "Post id is required", 400));
+    }
     const pool = await mssql.connect(sqlConfig);
     const request = await pool
       .request()
@@ -200,7 +212,6 @@ export const deletePost = async (req, res) => {
   }
 };
 
-// patch the posts controller using COALESCE
 /**
  * A controller for updating a post by id
  *@param {Object} req - The request object
@@ -209,16 +220,18 @@ export const deletePost = async (req, res) => {
 export const updatePostById = async (req, res) => {
   try {
     const { id } = req.params;
-    const { post } = req.body;
+    const { post, postImage, postVideo } = req.body;
     const updatedAt = new Date();
     const pool = await mssql.connect(sqlConfig);
     const request = await pool
       .request()
       .input("id", mssql.UniqueIdentifier, id)
-      .input("post", mssql.VarChar, post)
+      .input("post", mssql.NVarChar, post)
+      .input("postImage", mssql.VarChar, postImage)
+      .input("postVideo", mssql.VarChar, postVideo)
       .input("updatedAt", mssql.DateTime, updatedAt)
       .query(
-        "UPDATE socialClout.posts SET post = COALESCE(@post, post), updatedAt = COALESCE(@updatedAt, updatedAt) WHERE id = @id"
+        "UPDATE socialClout.posts SET post = COALESCE(@post, post), postImage = COALESCE(@postImage, postImage), postVideo = COALESCE(@postVideo, postVideo), updatedAt = COALESCE(@updatedAt, updatedAt) WHERE id = @id"
       );
     if (request.rowsAffected[0] === 1) {
       const postRequest = await pool
@@ -226,6 +239,7 @@ export const updatePostById = async (req, res) => {
         .input("id", mssql.UniqueIdentifier, id)
         .query("SELECT * FROM socialClout.posts WHERE id = @id");
       const results = postRequest.recordset;
+      updatedAt;
       res
         .status(200)
         .json(apiJSON(results[0], "Post updated successfully", 200));
