@@ -16,7 +16,7 @@ export const getLikes = async (req, res) => {
     const result = await pool
       .request()
       .query("SELECT * FROM socialClout.likes");
-    res.json(apiJSON(result.recordset), "success", 200);
+    res.json(apiJSON(result.recordset, "success", 200));
   } catch (error) {
     res.json(apiJSON(error, "error", 500));
   } finally {
@@ -38,7 +38,7 @@ export const getLikesById = async (req, res) => {
       .request()
       .input("id", mssql.UniqueIdentifier, req.params.id)
       .query("SELECT * FROM socialClout.likes WHERE id = @id");
-    res.json(apiJSON(result.recordset), "success", 200);
+    res.json(apiJSON(result.recordset, "success", 200));
   } catch (error) {
     res.json(apiJSON(error, "error", 500));
   } finally {
@@ -62,7 +62,7 @@ export const getLikesByUserId = async (req, res) => {
       .request()
       .input("userId", mssql.UniqueIdentifier, req.params.userId)
       .query("SELECT * FROM socialClout.likes WHERE userId = @userId");
-    res.json(apiJSON(result.recordset), "success", 200);
+    res.json(apiJSON(result.recordset, "success", 200));
   } catch (error) {
     res.json(apiJSON(error, "error", 500));
   } finally {
@@ -132,7 +132,11 @@ export const deleteLike = async (req, res) => {
       .request()
       .input("id", mssql.UniqueIdentifier, req.params.id)
       .query("DELETE FROM socialClout.likes WHERE id = @id");
-    res.json(apiJSON(result.recordset), "success", 200);
+    if (result.rowsAffected[0] === 0) {
+      res.json(apiJSON("no like found", "error", 500));
+    } else {
+      res.json(apiJSON(result.recordset, "success", 200));
+    }
   } catch (error) {
     res.json(apiJSON(error, "error", 500));
   } finally {
@@ -155,7 +159,11 @@ export const deleteLikeByUserIdAndPostId = async (req, res) => {
       .query(
         "DELETE FROM socialClout.likes WHERE userId = @userId AND postId = @postId"
       );
-    res.json(apiJSON(result.recordset, "success", 200));
+    if (result.rowsAffected[0] === 0) {
+      res.json(apiJSON("no like found", "error", 500));
+    } else {
+      res.json(apiJSON(result.recordset, "success", 200));
+    }
   } catch (error) {
     res.json(apiJSON(error, "error", 500));
   } finally {
