@@ -14,6 +14,7 @@ import {
 import {
   createFollow,
   deleteFollow,
+  deleteFollowerByUserIdAndFollowerId,
   getAllFollowers,
   getAllFollowersByFollowerId,
   getAllFollowersByUserId,
@@ -40,16 +41,21 @@ import {
   getPostById,
   getPosts,
   updatePost,
+  updatePostById,
 } from "../controllers/postsControllers.js";
 import {
   createUser,
+  getAllUsersNotFollowingAUser,
+  getPreviousCharts,
   getUserById,
   getUsers,
   patchUser,
+  searchUser,
   updateUser,
 } from "../controllers/user.js";
 import { Router } from "express";
 import { requireLogin } from "../utils/authMiddleware.js";
+import { createMessageRoom } from "../controllers/MessageRoomController.js";
 
 // Create a router object
 const routes = Router();
@@ -87,13 +93,20 @@ routes.post("/users", createUser);
  * Updates an existing user by id with the given data in the database.
  * @name users/:id
  */
-routes.put("/users/:id", requireLogin, updateUser);
+routes.put("/users/:id", updateUser);
 
 /**
  * patch an existing user by id with the given data in the database.
  * @name users/:id
  */
-routes.patch("/users/:id", requireLogin, patchUser);
+// requireLogin;
+routes.patch("/users/:id", patchUser);
+
+/**
+ * suggested following users
+ * @name /suggested/users
+ */
+routes.get("/suggested/users/:userId", getAllUsersNotFollowingAUser);
 
 /**
  * Get a all posts from the database.
@@ -124,6 +137,13 @@ routes.post("/posts", createPost);
  * @name posts/:id
  */
 routes.put("/posts/:id", updatePost);
+// updatePostById;
+
+/**
+ * patch an existing post by id with the given data in the database.
+ * @name posts/:id
+ */
+routes.patch("/posts/:id", updatePostById);
 
 /**
  * Deletes an existing post by id from the database.
@@ -147,10 +167,7 @@ routes.get("/messages", getMessages);
  * Get message by sender and receiver ids from the database.
  * @name messages/senders/:senderId/receivers/:receiverId/
  */
-routes.get(
-  "/messages/senders/:senderId/receivers/:receiverId/",
-  getMessageBySenderIdAndReceiverId
-);
+routes.get("/messages/:roomId", getMessageBySenderIdAndReceiverId);
 
 /**
  * Create user message
@@ -249,6 +266,15 @@ routes.post("/follower", createFollow);
 routes.delete("/followers/:id", deleteFollow);
 
 /**
+ * delete follower by user id and follower id
+ * @name followers/:userId/:followerId
+ */
+routes.delete(
+  "/followers/:userId/:followerId",
+  deleteFollowerByUserIdAndFollowerId
+);
+
+/**
  * get post comments
  * @name post/comments
  */
@@ -285,8 +311,23 @@ routes.put("/post/comments/:id", updatePostComment);
 routes.patch("/post/comments/:id", patchPostComment);
 
 /**
- * get following
+ *  post comment
+ * @name search/user
  */
+routes.post("/search/user", searchUser);
+
+/**
+ *  post comment
+ * @name /user/room
+ */
+routes.post("/chart/room", createMessageRoom);
+
+/**
+ *  Chart users
+ * @name /user/room
+ */
+routes.get("/chart/user/:userId", getPreviousCharts);
+
 /**
  * Exports the router object.
  * @name module:auth/routes
