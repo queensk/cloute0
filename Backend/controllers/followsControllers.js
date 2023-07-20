@@ -2,6 +2,7 @@ import { sqlConfig } from "../utils/db.js";
 import mssql from "mssql";
 import apiJSON from "../utils/apiJson.js";
 import { v4 as uuidv4 } from "uuid";
+import removePassword from "../utils/removePassword.js";
 
 /**
  * A controller for getting all followers
@@ -32,11 +33,14 @@ export const getAllFollowers = async (req, res) => {
 export const getAllFollowersByUserId = async (req, res) => {
   try {
     const pool = await mssql.connect(sqlConfig);
-    const result = await pool
+    const request = await pool
       .request()
       .input("userId", mssql.UniqueIdentifier, req.params.userId)
-      .query("SELECT * FROM socialClout.follows WHERE userId = @userId");
-    res.json(apiJSON(result.recordset, "success", 200));
+      .query(
+        "SELECT DISTINCT u.* FROM socialClout.follows f JOIN socialClout.users u ON f.followerId = u.id WHERE f.userId = @userId"
+      );
+    const results = await removePassword(request.recordset);
+    res.json(apiJSON(results, "success", 200));
   } catch (err) {
     res.json(apiJSON([], "error", 500));
   } finally {
@@ -106,6 +110,29 @@ export const deleteFollow = async (req, res) => {
       .request()
       .input("id", mssql.UniqueIdentifier, req.params.id)
       .query("DELETE FROM socialClout.follows WHERE id = @id");
+    res.json(apiJSON(result.recordset, "success", 200));
+  } catch (err) {
+    res.json(apiJSON([], "error", 500));
+  } finally {
+    mssql.close();
+  }
+};
+
+/**
+ * A controller for deleting follower by userId and followerId
+ *@param {Object} req - The request object
+ *@param {Object} res - The response object
+ */
+export const deleteFollowerByUserIdAndFollowerId = async (req, res) => {
+  try {
+    const pool = await mssql.connect(sqlConfig);
+    const result = await pool
+      .request()
+      .input("userId", mssql.UniqueIdentifier, req.params.userId)
+      .input("followerId", mssql.UniqueIdentifier, req.params.followerId)
+      .query(
+        "DELETE FROM socialClout.follows WHERE userId = @userId AND followerId = @followerId"
+      );
     res.json(apiJSON(result.recordset, "success", 200));
   } catch (err) {
     res.json(apiJSON([], "error", 500));
