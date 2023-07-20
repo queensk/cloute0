@@ -17,7 +17,7 @@ export const getUsers = async (req, res) => {
     const pool = await mssql.connect(sqlConfig);
     const request = await pool
       .request()
-      .query("SELECT * FROM socialClout.users");
+      .query("SELECT * FROM socialClout.users ORDER BY createAt ASC");
     const results = await removePassword(request.recordset);
     res.status(200).json(apiJSON(results, "Users fetched successfully", 200));
   } catch (err) {
@@ -68,6 +68,7 @@ export const createUser = async (req, res) => {
       email,
       password,
       profilePic,
+      bannerPic,
       bio,
       location,
       website,
@@ -92,8 +93,9 @@ export const createUser = async (req, res) => {
       .input("joined", mssql.VarChar, joined)
       .input("createAt", mssql.DateTime, createAt)
       .input("updatedAt", mssql.DateTime, updatedAt)
+      .input("bannerPic", mssql.VarChar, bannerPic)
       .query(
-        "INSERT INTO socialClout.users (id, name, userName, email, password, profilePic, bio, location, website, joined, createAt, updatedAt) VALUES (@id, @name, @userName, @email, @password,@profilePic, @bio, @location, @website, @joined, @createAt, @updatedAt)"
+        "INSERT INTO socialClout.users (id, name, userName, email, password, profilePic, bio, location, website, joined, createAt, updatedAt, bannerPic) VALUES (@id, @name, @userName, @email, @password,@profilePic, @bio, @location, @website, @joined, @createAt, @updatedAt, @bannerPic)"
       );
     if (request.rowsAffected[0] === 1) {
       const userRequest = await pool
@@ -108,6 +110,7 @@ export const createUser = async (req, res) => {
       res.status(400).json(apiJSON({}, "User creation failed", 400));
     }
   } catch (err) {
+    console.log(err);
     res.status(500).json(apiJSON({}, err, 500));
   } finally {
     mssql.close();
@@ -127,22 +130,12 @@ export const updateUser = async (req, res) => {
       email,
       password,
       profilePic,
+      bannerPic,
       bio,
       location,
       website,
       joined,
     } = req.body;
-    console.log(
-      name,
-      userName,
-      email,
-      password,
-      profilePic,
-      bio,
-      location,
-      website,
-      joined
-    );
     const hashedPassword = password
       ? bcrypt.hashSync(password, config.salt_rounds)
       : null;
@@ -156,6 +149,7 @@ export const updateUser = async (req, res) => {
       .input("email", mssql.VarChar, email)
       .input("password", mssql.VarChar, hashedPassword)
       .input("profilePic", mssql.VarChar, profilePic)
+      .input("bannerPic", mssql.VarChar, bannerPic)
       .input("bio", mssql.VarChar, bio)
       .input("location", mssql.VarChar, location)
       .input("website", mssql.VarChar, website)
@@ -169,6 +163,7 @@ export const updateUser = async (req, res) => {
         location = @location,
         website = @website,
         joined = @joined,
+        bannerPic = @bannerPic,
         updatedAt = @updatedAt WHERE id = @id`
       );
     if (request.rowsAffected[0] === 1) {
@@ -206,6 +201,7 @@ export const patchUser = async (req, res) => {
       email,
       password,
       profilePic,
+      bannerPic,
       bio,
       location,
       website,
@@ -224,13 +220,14 @@ export const patchUser = async (req, res) => {
       .input("email", mssql.VarChar, email)
       .input("password", mssql.VarChar, hashedPassword)
       .input("profilePic", mssql.VarChar, profilePic)
+      .input("bannerPic", mssql.VarChar, bannerPic)
       .input("bio", mssql.VarChar, bio)
       .input("location", mssql.VarChar, location)
       .input("website", mssql.VarChar, website)
       .input("joined", mssql.VarChar, joined)
       .input("updatedAt", mssql.DateTime, updatedAt)
       .query(
-        "UPDATE socialClout.users SET name = COALESCE(@name, name), userName = COALESCE(@userName, userName), email = COALESCE(@email, email), password = COALESCE(@password, password), profilePic = COALESCE(@profilePic, profilePic), bio = COALESCE(@bio, bio), location = COALESCE(@location, location), website = COALESCE(@website, website), joined = COALESCE(@joined, joined), updatedAt = COALESCE(@updatedAt, updatedAt) WHERE id = @id"
+        "UPDATE socialClout.users SET name = COALESCE(@name, name), userName = COALESCE(@userName, userName), email = COALESCE(@email, email), password = COALESCE(@password, password), profilePic = COALESCE(@profilePic, profilePic),  bio = COALESCE(@bio, bio), location = COALESCE(@location, location), website = COALESCE(@website, website), joined = COALESCE(@joined, joined), updatedAt = COALESCE(@updatedAt, updatedAt), bannerPic = COALESCE(@bannerPic, bannerPic) WHERE id = @id"
       );
 
     if (request.rowsAffected[0] === 1) {
@@ -244,6 +241,103 @@ export const patchUser = async (req, res) => {
         .json(apiJSON(results[0], "User updated successfully", 200));
     } else {
       res.status(404).json(apiJSON({}, "User not found", 404));
+    }
+  } catch (err) {
+    res.status(500).json(apiJSON({}, err.message, 500));
+  } finally {
+    mssql.close();
+  }
+};
+
+/**
+ * controller to search for a user by username
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ */
+
+export const searchUser = async (req, res) => {
+  try {
+    const { userName } = req.body;
+    const pool = await mssql.connect(sqlConfig);
+    const request = await pool
+      .request()
+      .input("userName", mssql.VarChar, userName)
+      .query(
+        "SELECT TOP 5 * FROM socialClout.users WHERE userName LIKE '%' + @userName + '%'"
+      );
+    if (request.recordset.length > 0) {
+      const results = await removePassword(request.recordset);
+      res.status(200).json(apiJSON(results, "Users found", 200));
+    } else {
+      res.status(404).json(apiJSON({}, "No users found", 404));
+    }
+  } catch (err) {
+    res.status(500).json(apiJSON({}, err.message, 500));
+  } finally {
+    mssql.close();
+  }
+};
+
+/**
+ * controller to suggest users for a user by userID
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ */
+
+export const getAllUsersNotFollowingAUser = async (req, res) => {
+  try {
+    console.log(req.params);
+    const { userId } = req.params;
+    const pool = await mssql.connect(sqlConfig);
+    const request = await pool
+      .request()
+      .input("id", mssql.UniqueIdentifier, userId)
+      .query(
+        `SELECT * FROM socialClout.users
+            WHERE id NOT IN (
+              SELECT followerId FROM socialClout.follows
+              WHERE userId = @id
+            );`
+      );
+    if (request.recordset.length > 0) {
+      const results = await removePassword(request.recordset);
+      res.status(200).json(apiJSON(results, "Users found", 200));
+    } else {
+      res.status(404).json(apiJSON({}, "No users found", 404));
+    }
+  } catch (err) {
+    res.status(500).json(apiJSON({}, err.message, 500));
+  } finally {
+    mssql.close();
+  }
+};
+
+/**
+ * controller to get a user previous charts
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ */
+export const getPreviousCharts = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const pool = await mssql.connect(sqlConfig);
+    const request = await pool
+      .request()
+      .input("currentUserId", mssql.UniqueIdentifier, userId)
+      .query(
+        `SELECT u.id, u.name, u.userName, u.email, u.profilePic, u.bio, u.location, u.website, u.joined, MAX(m.createAt) AS lastMessageTime
+          FROM socialClout.users u
+          JOIN socialClout.user_messages m
+          ON u.id = m.senderId OR u.id = m.receiverId
+          WHERE m.senderId = '71f6f045-d299-43f0-a3c5-410b202e79cc' OR m.receiverId = '71f6f045-d299-43f0-a3c5-410b202e79cc'
+          GROUP BY u.id, u.name, u.userName, u.email, u.password, u.profilePic, u.bio, u.location, u.website, u.joined
+          ORDER BY lastMessageTime DESC;`
+      );
+    if (request.recordset.length > 0) {
+      const results = await removePassword(request.recordset);
+      res.status(200).json(apiJSON(results, "Charts found", 200));
+    } else {
+      res.status(404).json(apiJSON({}, "No charts found", 404));
     }
   } catch (err) {
     res.status(500).json(apiJSON({}, err.message, 500));
