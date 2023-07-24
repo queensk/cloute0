@@ -21,7 +21,7 @@ const PostInput: React.FC = () => {
   const userId = useSelector((state: RootState) => state.auth.user?.id);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
-  const storageRef = ref(storage, `userId/posts`);
+  const storageRef = ref(storage, `${userId}/posts`);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContent(event.target.value);
