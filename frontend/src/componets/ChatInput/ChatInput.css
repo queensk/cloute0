@@ -1,47 +1,107 @@
-/* style the chat input */
 .chat-input {
-  /* use a flex display and align items to the center */
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #1da1f2;
+  padding: 16px;
+  width: 100%;
+  position: relative;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.message-input-container {
+  flex-grow: 1;
+  width: 100%;
   display: flex;
   align-items: center;
-
-  /* use a white background and a gray border */
-  background-color: #fff;
   border: 1px solid #ddd;
-
-  /* use some padding around the input and button */
-  padding: 10px;
+  border-radius: 24px;
+  padding: 4px 8px;
+  margin-right: 8px;
+  margin-bottom: 8px;
 }
 
-/* style the input element */
-.chat-input input {
-  /* use a flex grow to fill the available space */
+.message-input {
   flex-grow: 1;
-
-  /* use a roboto font for the text */
-  font-family: "Roboto", sans-serif;
-
-  /* use a medium font size and a gray color */
-  font-size: 16px;
-  color: #333;
-
-  /* remove the default border and outline */
   border: none;
   outline: none;
+  padding: 8px;
+  font-family: "Roboto", sans-serif;
+  font-size: 16px;
+  color: #333;
 }
 
-/* style the button element */
-.chat-input button {
-  /* use a transparent background and border */
-  background-color: transparent;
-  border: none;
-
-  /* use a cursor pointer to indicate interactivity */
+.send-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
   cursor: pointer;
+  background-color: #1da1f2;
+  color: #fff;
+  border-radius: 50%;
+  margin-left: 8px;
+  border: none;
 }
 
-/* style the icon element */
-.chat-input button svg {
-  color: #0f9d58;
-  width: 32px;
-  height: 32px;
+.send-button svg {
+  width: 25px;
+  width: 25px;
+}
+
+.send-button:hover {
+  color: #1da1f2;
+  background-color: #fff;
+  border: 2px solid;
+}
+
+.additional-controls {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 100%;
+  /* flex-direction: column; */
+  margin-top: 8px;
+}
+
+.icon-container {
+  margin-bottom: 8px;
+}
+
+.image-label,
+.emoji-button,
+.clear-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  color: #1da1f2;
+  border: none;
+  margin: 0 5px;
+}
+
+.icon-container svg {
+  width: 30px;
+  height: 30px;
+}
+.emoji-picker-react {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 10;
+}
+
+.image-preview {
+  max-width: 100%;
+  height: auto;
+  margin-top: 16px;
 }
