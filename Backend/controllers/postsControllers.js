@@ -56,6 +56,7 @@ export const getPaginationPosts = async (req, res) => {
     const results = request.recordset;
     res.status(200).json(apiJSON(results, "Posts fetched successfully", 200));
   } catch (err) {
+    console.error(err);
     res.status(500).json(apiJSON({}, err, 500));
   } finally {
     mssql.close();
@@ -122,7 +123,7 @@ export const createPost = async (req, res) => {
       .input("createdAt", mssql.DateTime, createdAt)
       .input("updatedAt", mssql.DateTime, updatedAt)
       .query(
-        "INSERT INTO socialClout.posts (id, userId, post, postImage, postVideo, createdAt, updatedAt) VALUES (@id, @userId, @post, @postImage, @postVideo, @createdAt, @)"
+        "INSERT INTO socialClout.posts (id, userId, post, postImage, postVideo, createdAt, updatedAt) VALUES (@id, @userId, @post, @postImage, @postVideo, @createdAt, @updatedAt)"
       );
     if (request.rowsAffected[0] === 1) {
       const postRequest = await pool

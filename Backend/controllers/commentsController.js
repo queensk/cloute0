@@ -74,7 +74,6 @@ export const getPostCommentsByPostId = async (req, res) => {
 export const createPostComment = async (req, res) => {
   try {
     const pool = await mssql.connect(sqlConfig);
-    console.log(req.body.userId, req.body.postId);
     const result = await pool
       .request()
       .input("id", mssql.UniqueIdentifier, uuidv4())
