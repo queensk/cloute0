@@ -14,3 +14,13 @@
 .friend-data-info {
   margin: 0 3%;
 }
+.friend-data-info-extra {
+  display: flex;
+}
+
+.friend-data-info-extra-icon {
+  margin: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
