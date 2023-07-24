@@ -1,8 +1,8 @@
 import Nav from "../../componets/Nav/Nav";
 import SideNav from "../../componets/SideNav/SideNav";
 import "./Messages.css";
-import Suggestions from "../../componets/Suggestions/Suggestions";
 import MainMessages from "../../componets/MainMessages/MainMessages";
+import ChatUsers from "../../componets/ChartUsers/ChatUsers";
 
 export default function Messages() {
   return (
@@ -11,7 +11,7 @@ export default function Messages() {
       <div className="home-main">
         <SideNav />
         <MainMessages />
-        <Suggestions />
+        <ChatUsers />
       </div>
     </div>
   );
