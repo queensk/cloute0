@@ -1,5 +1,5 @@
 import "./MainProfile.css";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import { usePatchUserMutation } from "../../features/auth/authApi";
@@ -13,6 +13,9 @@ import {
   MdCalendarMonth,
 } from "react-icons/md";
 import { Link } from "react-router-dom";
+import ProfilePosts from "../ProfilePosts/ProfilePosts";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import storage from "../../config/firebaseconfig";
 
 export default function MainProfile() {
   const userData = useSelector((state: RootState) => state.auth.user);
@@ -24,6 +27,12 @@ export default function MainProfile() {
   const [website, setWebsite] = useState(userData.website || "");
   const [patchUser] = usePatchUserMutation();
   const dispatch = useDispatch();
+  const profileInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
+
+  const storageRef = ref(storage, `${userData.id}/profile`);
+  const [bannerImage, setBannerImage] = useState<File | null>(null);
+  const [profileImage, setProfileImage] = useState<File | null>(null);
 
   const dummyData = {
     name: "John Doe", // a dummy name
@@ -36,9 +45,11 @@ export default function MainProfile() {
     followers: 456, // a dummy followers count
     tweets: 789, // a dummy tweets count
   };
+
   const handleEdit = () => {
     setEditMode(!editMode);
   };
+
   const handleSave = async () => {
     const data = {
       name: name,
@@ -47,43 +58,111 @@ export default function MainProfile() {
       location: location,
       website: website,
     };
+    let profilePic: string = userData.profilePic || "";
+    let bannerPic: string = userData.bannerPic || "";
+
+    if (bannerImage) {
+      const bannerFileRef = ref(storageRef, "bannerImage");
+      await uploadBytes(bannerFileRef, bannerImage);
+      bannerPic = await getDownloadURL(bannerFileRef);
+    }
+    if (profileImage) {
+      const profileFileRef = ref(storageRef, "profileImage");
+      await uploadBytes(profileFileRef, profileImage);
+      profilePic = await getDownloadURL(profileFileRef);
+    }
+    const updatedData = { ...data, profilePic, bannerPic };
+
     const response = await patchUser({
       id: userData.id,
-      user: data,
+      user: updatedData,
     });
+
     if ("data" in response && "data" in response.data) {
       const updatedUserData: UserData = response.data.data;
       dispatch(setUser(updatedUserData));
       setEditMode(false);
+      setBannerImage(null);
+      setProfileImage(null);
     } else if ("error" in response && response.error) {
       console.error(response.error);
     } else {
       console.error("Invalid response format");
     }
   };
+
+  const handleProfileUpload = () => {
+    if (profileInputRef.current) {
+      profileInputRef.current.click();
+    }
+  };
+
+  const handleBannerUpload = () => {
+    if (bannerInputRef.current) {
+      bannerInputRef.current.click();
+    }
+  };
+
   return (
     <div className="main-container">
       <div className="user-profile">
         <img
-          src="https://picsum.photos/id/237/200/300"
+          src={
+            userData.bannerPic
+              ? userData.bannerPic
+              : "https://picsum.photos/id/237/200/300"
+          }
           alt="User Banner"
           className="user-banner"
         />
         {editMode && (
-          <button className="upload-user-banner-button">
-            <MdAddPhotoAlternate />
-          </button>
+          <>
+            <button
+              className="upload-user-banner-button"
+              onClick={handleBannerUpload}
+            >
+              <MdAddPhotoAlternate />
+            </button>
+            <input
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={(e) =>
+                setBannerImage(e.target.files ? e.target.files[0] : null)
+              }
+              ref={bannerInputRef}
+            />
+          </>
         )}
+
         <div className="user-info">
           <img
-            src="https://picsum.photos/id/237/200/300"
+            src={
+              userData.profilePic
+                ? userData.profilePic
+                : "https://picsum.photos/id/237/200/300"
+            }
             alt="User Avatar"
             className="user-avatar"
           />
           {editMode && (
-            <button className="upload-user-avatar-button">
-              <MdAddPhotoAlternate />
-            </button>
+            <>
+              <button
+                className="upload-user-avatar-button"
+                onClick={handleProfileUpload}
+              >
+                <MdAddPhotoAlternate />
+              </button>
+              <input
+                type="file"
+                accept="image/*"
+                style={{ display: "none" }}
+                onChange={(e) =>
+                  setProfileImage(e.target.files ? e.target.files[0] : null)
+                }
+                ref={profileInputRef}
+              />
+            </>
           )}
           <button
             className="edit-button"
@@ -125,7 +204,6 @@ export default function MainProfile() {
                 <p className="user-bio">{userData.bio || `create a bio`}</p>
               </div>
             )}
-
             <div className="user-details">
               {editMode ? (
                 <div className="user-details-input-location-website">
@@ -183,9 +261,7 @@ export default function MainProfile() {
                 </>
               )}
             </div>
-            <div className="user-posts">
-              <h3>No Posts</h3>
-            </div>
+            <ProfilePosts />
           </div>
         </div>
       </div>
