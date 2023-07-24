@@ -1,0 +1,100 @@
+.message-list {
+  /* use a fixed height and overflow scroll */
+  height: 60vh;
+  overflow-y: scroll;
+
+  /* use a light gray background */
+  background-color: #f0f0f0;
+
+  /* use some padding and margin */
+  padding: 10px;
+  margin: 20px;
+
+  /* use a box shadow for some depth */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* style the message */
+.message {
+  /* use a flex display and align items to the start */
+  display: flex;
+  align-items: flex-start;
+
+  /* use some margin between messages */
+  margin-bottom: 10px;
+}
+
+/* style the message when it is aligned to the right */
+.message-right {
+  /* use margin-left auto to push it to the right */
+  margin-left: auto;
+}
+
+/* style the message when it is aligned to the left */
+.message-left {
+  /* use margin-right auto to push it to the left */
+  margin-right: auto;
+}
+
+/* style the message sender */
+.message-sender {
+  /* use a small font size and a gray color */
+  font-size: 12px;
+  color: #999;
+
+  /* use some margin below the name */
+  margin-bottom: 2px;
+}
+
+/* style the message text */
+.message-text {
+  /* use a white background and a black color */
+  background-color: #fff;
+  color: #000;
+
+  /* use some padding around the text */
+  padding: 8px;
+
+  /* use a border radius for rounded corners */
+  border-radius: 8px;
+
+  /* use a max width to prevent overflow */
+  max-width: 80%;
+
+  /* use a roboto font for the text */
+  font-family: "Roboto", sans-serif;
+}
+
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: gray;
+  margin-right: 5px;
+  animation: bounce 1.5s infinite ease-in-out;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1);
+  }
+}
