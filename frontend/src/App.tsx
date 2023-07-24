@@ -50,11 +50,11 @@ function App() {
           <Route path="/profile" element={<Profile />} />
         </Route>
 
-        <Route path="/about" element={<Home />} />
-        <Route path="/contact" element={<Home />} />
+        {/* <Route path="/about" element={<Home />} /> */}
+        {/* <Route path="/contact" element={<Home />} /> */}
         <Route path="/login" element={<SignIn />} />
         <Route path="/register" element={<SignUp />} />
-        <Route path="/dashboard" element={<Home />} />
+        {/* <Route path="/dashboard" element={<Home />} /> */}
       </Routes>
     </>
   );
