@@ -1,9 +1,15 @@
 import { FaSearch } from "react-icons/fa";
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import "./SearchForm.css";
-
-// Define a custom hook to get the current path
+import {
+  useSearchUserQuery,
+  useUseMessageUserMutation,
+} from "../../features/auth/authApi";
+import { MdChat } from "react-icons/md";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../Redux/store";
+import { setMessage } from "../../features/chatSlice/chatSlice";
 
 interface User {
   Biography: string | null;
@@ -25,15 +31,13 @@ type SearchFormProps = {};
 const SearchForm: React.FC<SearchFormProps> = () => {
   const path = usePath();
   //   const { setMessageUser } = useContext(MessageUserContext);
-
+  const [messageUser] = useUseMessageUserMutation();
   const [inputValue, setInputValue] = useState("");
-
-  //   const [results, setResults] = useState<User[]>([]);
-
+  const [results, setResults] = useState<User[]>([]);
   const [showResults, setShowResults] = useState(false);
-
   const resultsRef = useRef<HTMLDivElement>(null);
-
+  const dispatch = useDispatch();
+  const userId = useSelector((state: RootState) => state.auth.user.id);
   const handleClickOutside = (event: MouseEvent) => {
     if (
       resultsRef.current &&
@@ -54,35 +58,32 @@ const SearchForm: React.FC<SearchFormProps> = () => {
     setInputValue(event.target.value);
     setShowResults(true);
   };
+  console.log(results);
 
-  const search = () => {
-    // if (inputValue) {
-    //   if (path === "/messages" || path === "/") {
-    //     const filterParam = {
-    //       name: inputValue,
-    //     };
-    //     api
-    //       .post("/user/search", filterParam, {
-    //         headers: {
-    //           Authorization: `JWT ${state.token}`,
-    //         },
-    //       })
-    //       .then((res) => {
-    //         setResults(res.data.data);
-    //       })
-    //       .catch((err) => {
-    //         console.log(err);
-    //       });
-    //   } else {
-    //   }
-    // } else {
-    //   setResults([]);
-    // }
+  const { data, isSuccess, isLoading } = useSearchUserQuery({
+    userName: inputValue,
+  });
+  const handleClickSearch = async (receiverId) => {
+    const userRoom = await messageUser({
+      senderId: userId,
+      receiverId: receiverId,
+    });
+    dispatch(
+      setMessage({
+        senderId: userId,
+        receiverId: receiverId,
+        roomId: userRoom.data.data[0].id,
+      })
+    );
+    setShowResults(false);
   };
 
   useEffect(() => {
-    search();
-  }, [inputValue, path]);
+    if (isSuccess && data) {
+      // update the results state with the data
+      setResults(data.data);
+    }
+  }, [isSuccess, data]);
 
   return (
     <div className="search-form">
@@ -105,32 +106,31 @@ const SearchForm: React.FC<SearchFormProps> = () => {
         ref={resultsRef}
         style={{ display: showResults ? "block" : "none" }}
       >
-        {/* {results.length > 0 &&
+        {results.length > 0 &&
           results.map((result) => (
             <div
-              key={result.UserID}
+              key={result.id}
               className="search-result"
-              onClick={() => {
-                setMessageUser(result);
-                setShowResults(false);
-              }}
+              onClick={() => handleClickSearch(result.id)}
             >
-              {path === "/messages" ||
-                (path === "/" && (
-                  <>
-                    <img
-                      src={
-                        result.ProfilePicture
-                          ? result.ProfilePicture
-                          : "https://randomuser.me/api/portraits/men/3.jpg"
-                      }
-                      alt={result.Username}
-                    />
-                    <p>{result.Username}</p>
-                  </>
-                ))}
+              <div className="search-result-info">
+                <img
+                  src={
+                    result.profilePic
+                      ? result.profilePic
+                      : "https://randomuser.me/api/portraits/men/3.jpg"
+                  }
+                  alt={result.name}
+                />
+                <p>{result.userName}</p>
+              </div>
+              <div className="search-result-message">
+                <span className="user-search-btn">
+                  <MdChat />
+                </span>
+              </div>
             </div>
-          ))} */}
+          ))}
       </div>
     </div>
   );
