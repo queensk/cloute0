@@ -4,6 +4,8 @@ import storage from "redux-persist/lib/storage";
 import { authApi } from "../features/auth/authApi";
 import { authReducer } from "../features/auth/authSlice";
 import uiReducer from "./uiSlice";
+import chatSlice from "../features/chatSlice/chatSlice";
+import socketSlice from "../features/socketSlice/socketSlice";
 
 const persistConfig = {
   key: "root",
@@ -14,6 +16,8 @@ const rootReducer = combineReducers({
   auth: persistReducer(persistConfig, authReducer),
   [authApi.reducerPath]: authApi.reducer,
   ui: persistReducer(persistConfig, uiReducer),
+  userChart: persistReducer(persistConfig, chatSlice),
+  socket: socketSlice,
 });
 
 export const store = configureStore({
