@@ -55,7 +55,7 @@
   margin: 3% 0;
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  /* justify-content: space-around; */
 }
 
 .post-footer svg {
@@ -72,10 +72,20 @@
 
 .comment {
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
+  justify-content: space-between;
+  background-color: #e8f0fe;
+  padding: 2%;
+  border-radius: 10px;
   margin-bottom: 10px;
 }
-
+.comment-user {
+  width: 100%;
+  display: flex;
+  /* align-items: center; */
+  justify-content: space-between;
+}
 .comment-user img {
   width: 32px;
   height: 32px;
@@ -122,4 +132,23 @@
   color: #1da1f2;
   cursor: pointer;
   font-size: 18px;
+}
+
+.post-footer-comment {
+  cursor: pointer;
+  margin: 0 3%;
+}
+
+.post-footer-comment:hover {
+  color: #1da1f2;
+}
+.post-footer-like {
+  cursor: pointer;
+}
+.post-footer-like:hover {
+  color: #1da1f2;
+}
+
+.user-liked {
+  color: red;
 }
