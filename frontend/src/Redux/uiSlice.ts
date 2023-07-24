@@ -15,10 +15,11 @@ export const uiSlice = createSlice({
     changeUI: (state, action: PayloadAction<UIState["ui"]>) => {
       state.ui = action.payload;
     },
+    resetUI: () => initialState,
   },
 });
 
-export const { changeUI } = uiSlice.actions;
+export const { changeUI, resetUI } = uiSlice.actions;
 export const selectUI = (state: { ui: UIState }) => state.ui.ui;
 
 export default uiSlice.reducer;
