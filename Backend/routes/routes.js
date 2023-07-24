@@ -222,7 +222,7 @@ routes.delete("/like/posts/:id", deletePost);
  * @name likes/posts/:id
  */
 routes.delete("/like/post", deleteLikeByUserIdAndPostId);
-
+// /page/posts
 // /**
 //  * create likes for a post
 //  * @name likes/posts/:id
