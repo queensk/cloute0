@@ -80,8 +80,9 @@ const SignIn: React.FC = () => {
           <div className="signIn-terms-container">
             {/* {isError && <p>Invalid credentials</p>} */}
             {/* {isLoading && <p>Invalid credentials</p>} */}
+            <p>Forgot password?</p>
             <p>
-              Forgot password? Sign up for <Link to="/">cloute0</Link>
+              Sign up for <Link to="/register">cloute0</Link>
             </p>
           </div>
         </form>
