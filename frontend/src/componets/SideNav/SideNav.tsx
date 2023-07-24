@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import "./SideNav.css";
 import Logo from "./Frame 7.png";
 import { useSelector, useDispatch } from "react-redux";
-import { changeUI, UIState } from "../../Redux/uiSlice";
+import { changeUI, UIState, resetUI } from "../../Redux/uiSlice";
 import { AiOutlineHome } from "react-icons/ai";
 import {
   MdOutlineNotificationsActive,
@@ -43,6 +43,7 @@ const SideNav: React.FC = () => {
         dispatch(changeUI("Profile"));
         break;
       default:
+        dispatch(changeUI(""));
         break;
     }
   };
@@ -52,6 +53,7 @@ const SideNav: React.FC = () => {
   };
   const handleLogout = () => {
     dispatch(clearAuth());
+    dispatch(resetUI());
     navigate("/login", { replace: true });
   };
 
