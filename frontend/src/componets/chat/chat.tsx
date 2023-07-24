@@ -1,6 +1,6 @@
 // Import React and other modules
 import React, { useState, useEffect, useRef } from "react";
-import "./chart.css";
+import "./chat.css";
 import { Socket } from "socket.io-client";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
