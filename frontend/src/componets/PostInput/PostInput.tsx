@@ -8,7 +8,7 @@ import { useCreatePostMutation } from "../../features/auth/authApi";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import storage from "../../config/firebaseconfig";
+import storage from "../../config/firebaseconfig.tsx";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 
 const PostInput: React.FC = () => {

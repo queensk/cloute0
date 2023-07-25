@@ -15,7 +15,7 @@ import {
 import { Link } from "react-router-dom";
 import ProfilePosts from "../ProfilePosts/ProfilePosts";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import storage from "../../config/firebaseconfig";
+import storage from "../../config/firebaseconfig.tsx";
 
 export default function MainProfile() {
   const userData = useSelector((state: RootState) => state.auth.user);
