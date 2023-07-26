@@ -5,7 +5,7 @@ import { authApi } from "../features/auth/authApi";
 import { authReducer } from "../features/auth/authSlice";
 import uiReducer from "./uiSlice";
 import chatSlice from "../features/chatSlice/chatSlice";
-import socketSlice from "../features/socketSlice/socketSlice";
+import socketReducer from "../features/socketSlice/socketSlice";
 
 const persistConfig = {
   key: "root",
@@ -17,7 +17,7 @@ const rootReducer = combineReducers({
   [authApi.reducerPath]: authApi.reducer,
   ui: persistReducer(persistConfig, uiReducer),
   userChart: persistReducer(persistConfig, chatSlice),
-  socket: socketSlice,
+  socket: socketReducer,
 });
 
 export const store = configureStore({
