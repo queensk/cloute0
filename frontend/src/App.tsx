@@ -8,13 +8,17 @@ import Messages from "./pages/Messages/Messages";
 import Friends from "./pages/Friends/Friends";
 import Profile from "./pages/Profile/Profile";
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "./Redux/store";
 import RequireAuth from "./features/RequireAuth/RequireAuth";
+import { connectSocket, disconnectSocket } from "./features/socketSlice/socket";
 
 function App() {
   const ui = useSelector((state: RootState) => state?.ui?.ui);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { roomId } = useSelector((state: RootState) => state.userChart);
+  const userId = useSelector((state: RootState) => state.auth.user.id);
   useEffect(() => {
     if (ui) {
       const uiValue = ui;
@@ -39,6 +43,14 @@ function App() {
       }
     }
   }, [ui]);
+  useEffect(() => {
+    if (roomId) {
+      connectSocket(dispatch, roomId, userId);
+    }
+    return () => {
+      disconnectSocket(dispatch);
+    };
+  }, [roomId, userId]);
   return (
     <>
       <Routes>
