@@ -89,13 +89,15 @@ const Message: React.FC<MessageProps> = ({
   );
 };
 
-const MessageList: React.FC<MessageListProps> = ({ socket }) => {
+const MessageList: React.FC = () => {
   const [messages, setMessages] = useState<MessageProps[]>([]);
   const [newMessage, setNewMessage] = useState({});
   const [isTyping, setIsTyping] = useState(false);
   const { receiverId, roomId, senderId } = useSelector(
     (state: RootState) => state.userChart
   );
+  const socket = useSelector((state: RootState) => state.socket.socket);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollToBottom = () => {
@@ -103,29 +105,54 @@ const MessageList: React.FC<MessageListProps> = ({ socket }) => {
   };
 
   useEffect(() => {
-    socket.on("chartMessage", (msg) => {
-      console.log("message");
-      setNewMessage(msg);
-      // setMessages((messages) => [...messages, msg]);
-    });
-    socket.on("typing", (data) => {
-      if (data.senderId === receiverId && data.roomId === roomId) {
-        setIsTyping(true);
+    if (socket) {
+      socket.on("chartMessage", (msg) => {
+        setMessages((messages) => [...messages, msg]);
+
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current);
+        }
+
+        setIsTyping(false);
+      });
+      socket.on("typing", (data) => {
+        if (data.senderId === receiverId && data.roomId === roomId) {
+          setIsTyping(true);
+          if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+          }
+          typingTimeoutRef.current = setTimeout(() => {
+            setIsTyping(false);
+          }, 3000);
+        }
+      });
+      setTimeout(() => {
+        setIsTyping(false);
+        console.log(isTyping);
+      }, 3000);
+    }
+
+    return () => {
+      if (socket) {
+        socket.off("typing");
       }
-    });
-    setTimeout(() => {
-      setIsTyping(false);
-    }, 3000);
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
   }, [socket]);
 
   useEffect(() => {
-    if (roomId && senderId && receiverId) {
-      socket.emit("room", { roomId, senderId, receiverId });
+    if (socket) {
+      if (roomId && senderId && receiverId) {
+        socket.emit("room", { roomId, senderId, receiverId });
+      }
+      socket.on("roomMessages", (msgs) => {
+        console.log("room messages");
+        console.log(msgs);
+        setMessages(msgs);
+      });
     }
-    socket.on("roomMessages", (msgs) => {
-      console.log("room messages");
-      setMessages(msgs);
-    });
   }, [socket, roomId, senderId, receiverId, newMessage]);
 
   useEffect(() => {
