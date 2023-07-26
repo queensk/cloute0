@@ -1,3 +1,4 @@
+/* MainNotification.css */
 .main-notification-container {
   width: 60%;
   height: 100vh;
@@ -5,14 +6,58 @@
   border-left: 2px solid rgb(184, 183, 183);
   padding: 3%;
   overflow-y: scroll;
-  /* Hide scrollbar for Chrome, Safari and Opera */
+  /* Hide scrollbar for Chrome, Safari, and Opera */
   section::-webkit-scrollbar {
     display: none;
   }
-  /* Hide scrollbar for IE, Edge and Firefox */
+  /* Hide scrollbar for IE, Edge, and Firefox */
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+.main-notification-body-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+}
+
+.main-notification-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin: 1%;
+  padding: 2%;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+.main-notification-avatar {
+  display: flex;
+  width: 50%;
+}
+
+.main-notification-date {
+  display: flex;
+}
+
+/* Notification Types */
+.main-notification-item.like {
+  background-color: #ffe6e6; /* Light red for "Like" notifications */
+}
+.main-notification-item.comment {
+  background-color: #e6f7ff; /* Light blue for "Comment" notifications */
+}
+.main-notification-item.follow {
+  background-color: #f0ffe6; /* Light green for "Follow" notifications */
+}
+
+/* Read Status */
+.main-notification-item.read {
+  opacity: 0.7; /* Reduced opacity for read notifications */
+}
+
 .main-notification-header {
   margin: 1%;
   height: 10%;
@@ -43,4 +88,5 @@
 
 .main-notification-content p {
   margin: 1% 0;
+  width: 100%;
 }
