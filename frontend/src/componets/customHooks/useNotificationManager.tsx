@@ -6,22 +6,26 @@ import {
   NotificationData,
   NotificationManager,
 } from "../../types/Notification";
-
-const ENDPOINT = "http://localhost:8085";
+import { RootState } from "../../Redux/store";
+import { useSelector } from "react-redux";
 
 const useNotificationManager = (receiverId: string): NotificationManager => {
   const [notificationMessage, setNotificationMessage] = useState("");
-  const socket = socketIOClient(ENDPOINT);
+  const socket = useSelector((state: RootState) => state.socket.socket);
 
   useEffect(() => {
-    socket.emit("notificationConnect", { receiverId });
+    if (socket) {
+      socket.emit("notificationConnect", { receiverId });
+      socket.on("notification", (notification) => {
+        setNotificationMessage(notification.message);
+      });
+    }
   }, [receiverId]);
 
   const sendNotification = (type: NotificationType, data: NotificationData) => {
     let message = "";
     switch (type) {
       case NotificationType.Like:
-        console.log(data);
         message = `${data.senderName} liked your post.`;
         break;
       case NotificationType.Follow:
@@ -35,7 +39,9 @@ const useNotificationManager = (receiverId: string): NotificationManager => {
         break;
     }
 
-    socket.emit("notification", { type, data: { ...data, message } });
+    if (socket) {
+      socket.emit("sendNotification", { type, data: { ...data, message } });
+    }
   };
 
   return {
