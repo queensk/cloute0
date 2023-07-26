@@ -1,30 +1,23 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import socketIOClient from "socket.io-client";
+import { createSlice } from "@reduxjs/toolkit";
+import { Socket } from "socket.io-client";
 
-const ENDPOINT = "http://localhost:8085";
-
-export interface SocketState {
-  socket: SocketIOClient.Socket | null;
+interface SocketState {
+  socket: Socket | null;
 }
 
 const initialState: SocketState = {
-  socket: socketIOClient(ENDPOINT) || null,
+  socket: null,
 };
 
 const socketSlice = createSlice({
   name: "socket",
   initialState,
   reducers: {
-    initializeSocket(state, action: PayloadAction<string>) {
-      state.socket = socketIOClient(ENDPOINT, {
-        query: {
-          receiverId: action.payload,
-        },
-      });
+    setSocket: (state, action) => {
+      state.socket = action.payload;
     },
   },
 });
 
-export const { initializeSocket } = socketSlice.actions;
-
+export const { setSocket } = socketSlice.actions;
 export default socketSlice.reducer;
