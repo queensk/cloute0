@@ -6,21 +6,20 @@ import { Socket } from "socket.io-client";
 import { RootState } from "../../Redux/store";
 import { useSelector } from "react-redux";
 
-type ChatInputProps = {
-  socket: Socket; // the socket object
-};
-
-const ChatInput: React.FC<ChatInputProps> = ({ socket }) => {
+const ChatInput: React.FC = () => {
   const [message, setMessage] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [showPicker, setShowPicker] = useState(false);
   const { receiverId, roomId, senderId } = useSelector(
     (state: RootState) => state.userChart
   );
+  const socket = useSelector((state: RootState) => state.socket.socket);
 
   useEffect(() => {
-    if (message.trim()) {
-      socket.emit("typing", { senderId, roomId });
+    if (socket) {
+      if (message.trim()) {
+        socket.emit("typing", { senderId, roomId });
+      }
     }
   }, [message, socket, senderId, roomId]);
 
@@ -36,9 +35,12 @@ const ChatInput: React.FC<ChatInputProps> = ({ socket }) => {
         roomId: roomId,
         message: message,
       };
-
-      socket.emit("chartMessage", msg);
-      setMessage("");
+      if (socket) {
+        // socket.emit("joinRoom", { roomId: roomId });
+        console.log(`join room ${roomId}`);
+        socket.emit("chartMessage", msg);
+        setMessage("");
+      }
     }
   };
 
