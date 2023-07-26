@@ -5,12 +5,12 @@ import io from "socket.io-client";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import { useMessageUserDataQuery } from "../../features/auth/authApi";
+import { useRef } from "react";
 
 export default function MainMessages() {
   const { receiverId, roomId, senderId } = useSelector(
     (state: RootState) => state.userChart
   );
-  const socket = io("http://localhost:8085", { query: { roomId: roomId } });
   const { data, isLoading, isError, error } = useMessageUserDataQuery({
     receiverId,
   });
@@ -21,7 +21,14 @@ export default function MainMessages() {
         <h3>Message</h3>
         <div className="main-messages-tittle-about">
           <div>
-            <img src="https://picsum.photos/200/300" alt="message" />
+            <img
+              src={
+                data?.data.profilePic
+                  ? data?.data.profilePic
+                  : "https://picsum.photos/200/300"
+              }
+              alt="message"
+            />
           </div>
           <div className="main-messages-tittle-about-name">
             <p>{data?.data.name}</p>
@@ -29,8 +36,8 @@ export default function MainMessages() {
           </div>
         </div>
       </div>
-      <MessageList socket={socket} />
-      <ChatInput socket={socket} />
+      <MessageList />
+      <ChatInput />
     </div>
   );
 }
